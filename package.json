@@ -8,6 +8,7 @@
         "start": "next start"
     },
     "dependencies": {
+        "@anthropic-ai/sdk": "^0.97.1",
         "@tailwindcss/postcss": "^4.2.2",
         "@tailwindcss/typography": "^0.5.19",
         "@untitledui/file-icons": "^0.0.9",
