@@ -1,2 +1,2 @@
 
-const claude_model = process.env;
+const claude_model = process.env.CLAUDE_MODEL;
