@@ -17,6 +17,7 @@ const tints: Record<EventColor, { bg: string; border: string; text: string }> = 
   red:     { bg: "bg-utility-red-50",     border: "border-utility-red-200",     text: "text-utility-red-700" },
   green:   { bg: "bg-utility-green-50",   border: "border-utility-green-200",   text: "text-utility-green-700" },
   yellow:  { bg: "bg-utility-yellow-50",  border: "border-utility-yellow-200",  text: "text-utility-yellow-700" },
+  brand:   { bg: "bg-brand-secondary",    border: "border-brand",               text: "text-brand-secondary" },
 };
 
 export function EventPill({ event }: { event: CalendarEvent }) {

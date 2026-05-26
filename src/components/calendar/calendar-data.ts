@@ -20,7 +20,8 @@ export type EventColor =
   | "orange"
   | "red"
   | "green"
-  | "yellow";
+  | "yellow"
+  | "brand";
 
 export interface CalendarEvent {
   name: string;
@@ -54,167 +55,46 @@ export const may2026Days: DayCell[] = [
 
   // Week 2: May 3 – 9
   { date: 3 },
-  {
-    date: 4,
-    events: [
-      { name: "Coffee with Ali", time: "4:30 AM", color: "neutral" },
-      { name: "Marketing sit…", time: "7:30 AM", color: "neutral" },
-    ],
-  },
+  { date: 4 },
   { date: 5 },
   { date: 6 },
-  {
-    date: 7,
-    events: [
-      { name: "All-hands me…", time: "9:00 AM", color: "neutral" },
-      { name: "Dinner with …", time: "11:30 AM", color: "neutral" },
-    ],
-  },
+  { date: 7 },
   { date: 8 },
   { date: 9 },
 
   // Week 3: May 10 – 16
-  {
-    date: 10,
-    today: true,
-    events: [{ name: "Ava's engag…", time: "6:00 AM", color: "purple" }],
-  },
-  {
-    date: 11,
-    events: [
-      { name: "Monday stan…", time: "2:00 AM", color: "neutral" },
-      { name: "Content plan…", time: "4:00 AM", color: "blue" },
-    ],
-  },
-  {
-    date: 12,
-    events: [
-      { name: "Product demo", time: "3:30 AM", color: "blue" },
-      { name: "Catch up w/ …", time: "7:30 AM", color: "pink" },
-    ],
-  },
-  {
-    date: 13,
-    events: [
-      { name: "Deep work", time: "2:00 AM", color: "blue" },
-      { name: "One-on-one …", time: "3:00 AM", color: "red" },
-      { name: "Design sync", time: "3:30 AM", color: "blue" },
-    ],
-    overflow: 2,
-  },
-  {
-    date: 14,
-    events: [{ name: "Lunch with Ol…", time: "5:00 AM", color: "green" }],
-  },
-  {
-    date: 15,
-    events: [
-      { name: "Friday standup", time: "2:00 AM", color: "neutral" },
-      { name: "Olivia x Riley", time: "3:00 AM", color: "purple" },
-      { name: "Product demo", time: "6:30 AM", color: "blue" },
-    ],
-  },
-  {
-    date: 16,
-    events: [{ name: "House inspec…", time: "4:00 AM", color: "orange" }],
-  },
+  { date: 10, today: true },
+  { date: 11 },
+  { date: 12 },
+  { date: 13 },
+  { date: 14 },
+  { date: 15 },
+  { date: 16 },
 
   // Week 4: May 17 – 23
   { date: 17 },
-  {
-    date: 18,
-    events: [{ name: "Team lunch", time: "5:15 AM", color: "pink" }],
-  },
+  { date: 18 },
   { date: 19 },
-  {
-    date: 20,
-    events: [{ name: "Product plan…", time: "2:30 AM", color: "blue" }],
-  },
-  {
-    date: 21,
-    events: [
-      { name: "Amélie's first …", time: "3:00 AM", color: "red" },
-      { name: "All-hands me…", time: "9:00 AM", color: "neutral" },
-    ],
-  },
-  {
-    date: 22,
-    events: [
-      { name: "Coffee w/ Am…", time: "2:30 AM", color: "red" },
-      { name: "Design feedb…", time: "7:30 AM", color: "pink" },
-    ],
-  },
-  {
-    date: 23,
-    events: [{ name: "Half marathon", time: "12:00 AM", color: "green" }],
-  },
+  { date: 20 },
+  { date: 21 },
+  { date: 22 },
+  { date: 23 },
 
   // Week 5: May 24 – 30
   { date: 24 },
-  {
-    date: 25,
-    band: { name: "Team offsite", color: "green", span: 2 },
-    events: [{ name: "Deep work", time: "2:15 AM", color: "blue" }],
-  },
-  {
-    date: 26,
-    bandSpacer: true,
-    events: [
-      { name: "Quarterly revi…", time: "4:30 AM", color: "orange" },
-      { name: "Lunch with Z…", time: "6:00 AM", color: "green" },
-    ],
-  },
-  {
-    date: 27,
-    events: [
-      { name: "Deep work", time: "2:00 AM", color: "blue" },
-      { name: "Design sync", time: "7:30 AM", color: "blue" },
-    ],
-  },
-  {
-    date: 28,
-    events: [
-      { name: "Amélie coffee", time: "3:00 AM", color: "red" },
-      { name: "Dinner with …", time: "12:00 PM", color: "neutral" },
-    ],
-  },
-  {
-    date: 29,
-    events: [
-      { name: "Accountant", time: "6:45 AM", color: "yellow" },
-      { name: "Marketing sit…", time: "7:30 AM", color: "neutral" },
-    ],
-  },
+  { date: 25 },
+  { date: 26 },
+  { date: 27 },
+  { date: 28 },
+  { date: 29 },
   { date: 30 },
 
   // Week 6: May 31 – Jun 6
-  {
-    date: 31,
-    events: [{ name: "Drive to Sydn…", time: "2:00 AM", color: "orange" }],
-  },
-  {
-    date: 1,
-    outside: true,
-    events: [{ name: "Content plan…", time: "4:00 AM", color: "blue" }],
-  },
-  {
-    date: 2,
-    outside: true,
-    events: [{ name: "Lunch with Ali", time: "5:45 AM", color: "purple" }],
-  },
-  {
-    date: 3,
-    outside: true,
-    events: [{ name: "Product plan…", time: "2:30 AM", color: "blue" }],
-  },
-  {
-    date: 4,
-    outside: true,
-    events: [
-      { name: "All-hands me…", time: "9:00 AM", color: "neutral" },
-      { name: "Team dinner", time: "10:30 AM", color: "pink" },
-    ],
-  },
+  { date: 31 },
+  { date: 1, outside: true },
+  { date: 2, outside: true },
+  { date: 3, outside: true },
+  { date: 4, outside: true },
   { date: 5, outside: true },
   { date: 6, outside: true },
 ];

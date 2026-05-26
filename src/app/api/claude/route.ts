@@ -2,9 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 
 const APIKEY = process.env.CLAUDE_API_KEY;
-const MODEL = process.env.CLAUDE_MODEL;
 
-const anthropic = new Anthropic({apiKey: APIKEY, });
+const anthropic = new Anthropic({ apiKey: APIKEY });
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,18 +14,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "The 'text' field is required." }, { status: 400 });
     }
 
-    // needed for JSON format
     const today = new Date().toISOString().split('T')[0];
 
-    // baseline claude call
     const response = await anthropic.messages.create({
-      model:"claude-haiku-4-5-20251001",
+      model: "claude-haiku-4-5-20251001",
       max_tokens: 256,
       system: `Extract a calendar event as JSON with fields: title, date (YYYY-MM-DD), time (HH:MM), duration_minutes, location, recurrence. Output JSON only. Today is ${today}.`,
       messages: [{ role: "user", content: text }],
     });
 
-    // process and parse the call
     const messageContent = response.content[0];
     let rawOutput = messageContent.type === 'text' ? messageContent.text.trim() : '';
 
