@@ -36,8 +36,13 @@ export function Calendar() {
             const ev = await res.json();
             // ev = { title, date "YYYY-MM-DD", time "HH:MM", duration_minutes, location, recurrence }
 
-            const dayNum = new Date(ev.date + "T00:00:00").getDate();
-            const matched = days.some((cell) => cell.date === dayNum && !cell.outside);
+            const parsed = new Date(ev.date + "T00:00:00");
+            const dayNum = parsed.getDate();
+            const month = parsed.getMonth(); // 0-indexed
+            const year = parsed.getFullYear();
+            // Grid is fixed to May 2026 — reject dates outside that month
+            const inGridMonth = year === 2026 && month === 4;
+            const matched = inGridMonth && days.some((cell) => cell.date === dayNum && !cell.outside);
 
             if (!matched) {
                 setError(`The date ${ev.date} isn't visible on this month's grid.`);
@@ -47,6 +52,9 @@ export function Calendar() {
             const newEvent: CalendarEvent = {
                 name: ev.title,
                 time: ev.time ?? undefined,
+                duration_minutes: ev.duration_minutes ?? undefined,
+                location: ev.location ?? undefined,
+                recurrence: ev.recurrence ?? undefined,
                 color: "brand",
             };
 

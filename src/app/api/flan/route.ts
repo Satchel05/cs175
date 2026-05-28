@@ -1,7 +1,4 @@
-import { InferenceClient } from "@huggingface/inference";
 import { NextRequest, NextResponse } from "next/server";
-
-const MODEL = "google/flan-t5-base";
 
 export async function POST(req: NextRequest) {
     try {
@@ -13,28 +10,50 @@ export async function POST(req: NextRequest) {
         }
 
         const today = new Date().toISOString().split("T")[0];
-
         const prompt = `Extract a calendar event as JSON with fields: title, date (YYYY-MM-DD), time (HH:MM), duration_minutes, location, recurrence. Output JSON only, no explanation. Today is ${today}.\n\nInput: ${text}`;
 
-        const HF_MODEL_URL = process.env.HF_MODEL_URL ?? "https://api-inference.huggingface.co/models/google/flan-t5-base";
+        const HF_MODEL_URL = process.env.HF_MODEL_URL ?? "http://localhost:8000/predict";
         const response = await fetch(HF_MODEL_URL, {
             method: "POST",
             headers: {
-                Authorization: `Bearer ${process.env.HF_API_KEY}`,
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({ inputs: prompt }),
         });
+
         const result = await response.json();
         let rawOutput = result[0]?.generated_text ?? "";
 
-        if (rawOutput.startsWith("```json")) {
-            rawOutput = rawOutput.slice(7, -3).trim();
-        } else if (rawOutput.startsWith("```")) {
-            rawOutput = rawOutput.slice(3, -3).trim();
+        // strip markdown fences first
+        rawOutput = rawOutput.replace(/^```json\s*|^```\s*|\s*```$/gm, "").trim();
+
+        // extract the first {...} block if present, otherwise wrap bare key:value output
+        const jsonMatch = rawOutput.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+            rawOutput = jsonMatch[0];
+        } else if (!rawOutput.startsWith("{")) {
+            rawOutput = `{${rawOutput}}`;
         }
 
-        const parsedJson = JSON.parse(rawOutput);
+        console.log("Attempting to parse:", rawOutput);
+
+        let parsedJson: Record<string, unknown>;
+        try {
+            parsedJson = JSON.parse(rawOutput);
+        } catch {
+            // Model emitted bare keys with no value (e.g. `"date",`); extract only valid pairs
+            const obj: Record<string, unknown> = {};
+            const pairs = rawOutput.matchAll(/"([^"]+)"\s*:\s*("(?:[^"\\]|\\.)*"|-?\d+(?:\.\d+)?|true|false|null)/g);
+            for (const [, key, val] of pairs) {
+                obj[key] = JSON.parse(val);
+            }
+            if (Object.keys(obj).length === 0) throw new Error(`Unparseable model output: ${rawOutput}`);
+            parsedJson = obj;
+        }
+
+        if (!parsedJson.date || !/^\d{4}-\d{2}-\d{2}$/.test(parsedJson.date as string)) {
+            parsedJson.date = today;
+        }
 
         return NextResponse.json(parsedJson, { status: 200 });
     } catch (error) {

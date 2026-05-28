@@ -26,6 +26,9 @@ export type EventColor =
 export interface CalendarEvent {
   name: string;
   time?: string;
+  duration_minutes?: number;
+  location?: string;
+  recurrence?: string;
   color: EventColor;
 }
 

@@ -22,14 +22,19 @@ const tints: Record<EventColor, { bg: string; border: string; text: string }> = 
 
 export function EventPill({ event }: { event: CalendarEvent }) {
   const t = tints[event.color];
+  const meta = [
+    event.time,
+    event.duration_minutes ? `${event.duration_minutes} min` : undefined,
+    event.location,
+    event.recurrence && event.recurrence !== "none" ? event.recurrence : undefined,
+  ].filter(Boolean).join(" · ");
+
   return (
     <div
-      className={`flex cursor-pointer items-center justify-between gap-1.5 rounded-md border px-1.5 py-0.5 text-xs ${t.bg} ${t.border}`}
+      className={`flex cursor-pointer flex-col gap-0.5 rounded-md border px-1.5 py-1 text-xs ${t.bg} ${t.border}`}
     >
       <span className={`truncate font-medium ${t.text}`}>{event.name}</span>
-      {event.time && (
-        <span className="shrink-0 text-[11px] text-tertiary">{event.time}</span>
-      )}
+      {meta && <span className="truncate text-[11px] text-tertiary">{meta}</span>}
     </div>
   );
 }
