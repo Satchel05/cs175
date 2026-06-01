@@ -36,13 +36,8 @@ export function Calendar() {
             const ev = await res.json();
             // ev = { title, date "YYYY-MM-DD", time "HH:MM", duration_minutes, location, recurrence }
 
-            const parsed = new Date(ev.date + "T00:00:00");
-            const dayNum = parsed.getDate();
-            const month = parsed.getMonth(); // 0-indexed
-            const year = parsed.getFullYear();
-            // Grid is fixed to May 2026 — reject dates outside that month
-            const inGridMonth = year === 2026 && month === 4;
-            const matched = inGridMonth && days.some((cell) => cell.date === dayNum && !cell.outside);
+            const dayNum = new Date(ev.date + "T00:00:00").getDate();
+            const matched = days.some((cell) => cell.date === dayNum && !cell.outside);
 
             if (!matched) {
                 setError(`The date ${ev.date} isn't visible on this month's grid.`);
@@ -129,7 +124,7 @@ export function Calendar() {
                         placeholder='e.g. "Team lunch on May 20 at noon"'
                         className="h-8 flex-1 rounded-lg border border-secondary bg-primary px-3 text-sm text-primary placeholder:text-placeholder focus:border-brand focus:outline-none"
                     />
-                    <Button size="sm" color="primary" iconLeading={Plus} isLoading={loading} onPress={handleAddEvent}>
+                    <Button size="sm" color="primary" iconLeading={Plus} isLoading={loading} onClick={handleAddEvent}>
                         Add event
                     </Button>
                 </div>

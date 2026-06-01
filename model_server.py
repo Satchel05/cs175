@@ -4,7 +4,7 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 
 print("Loading model...")
-model_name = "fatimaw/flan-t5-calendar-parser-team10"
+model_name = "elliottescalante/tuned-flan-t5"
 tokenizer = T5Tokenizer.from_pretrained(model_name)
 model = T5ForConditionalGeneration.from_pretrained(model_name)
 print("Model ready!")
@@ -16,11 +16,10 @@ def predict():
     
     input_ids = tokenizer(inputs, return_tensors="pt").input_ids
     outputs = model.generate(
-        input_ids, 
-        max_new_tokens=256,
-        num_beams=4,          # beam search for better output
-        repetition_penalty=2.5,  # penalize repetition
-        early_stopping=True
+        input_ids,
+        max_new_tokens=128,
+        num_beams=1,
+        do_sample=False,
     )
     generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
     

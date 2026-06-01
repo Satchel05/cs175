@@ -4,8 +4,8 @@ import json
 
 app = Flask(__name__)
 
-tokenizer = AutoTokenizer.from_pretrained("your-username/flan-t5-calendar")
-model = AutoModelForSeq2SeqLM.from_pretrained("your-username/flan-t5-calendar")
+tokenizer = AutoTokenizer.from_pretrained("elliottescalante/tuned-flan-t5")
+model = AutoModelForSeq2SeqLM.from_pretrained("elliottescalante/tuned-flan-t5")
 model.eval()
 
 @app.route("/predict", methods=["POST"])

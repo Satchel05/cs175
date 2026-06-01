@@ -18,11 +18,11 @@ export async function POST(req: NextRequest) {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ inputs: prompt }),
+            body: JSON.stringify({ text: prompt }),
         });
 
         const result = await response.json();
-        let rawOutput = result[0]?.generated_text ?? "";
+        let rawOutput = (result.output ?? result[0]?.generated_text ?? "") as string;
 
         // strip markdown fences first
         rawOutput = rawOutput.replace(/^```json\s*|^```\s*|\s*```$/gm, "").trim();
