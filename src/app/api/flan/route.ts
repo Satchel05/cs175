@@ -22,33 +22,26 @@ export async function POST(req: NextRequest) {
         });
 
         const result = await response.json();
-        let rawOutput = (result.output ?? result[0]?.generated_text ?? "") as string;
-
-        // strip markdown fences first
-        rawOutput = rawOutput.replace(/^```json\s*|^```\s*|\s*```$/gm, "").trim();
-
-        // extract the first {...} block if present, otherwise wrap bare key:value output
-        const jsonMatch = rawOutput.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-            rawOutput = jsonMatch[0];
-        } else if (!rawOutput.startsWith("{")) {
-            rawOutput = `{${rawOutput}}`;
-        }
-
-        console.log("Attempting to parse:", rawOutput);
+        const output = result.output ?? result[0]?.generated_text;
 
         let parsedJson: Record<string, unknown>;
-        try {
-            parsedJson = JSON.parse(rawOutput);
-        } catch {
-            // Model emitted bare keys with no value (e.g. `"date",`); extract only valid pairs
-            const obj: Record<string, unknown> = {};
-            const pairs = rawOutput.matchAll(/"([^"]+)"\s*:\s*("(?:[^"\\]|\\.)*"|-?\d+(?:\.\d+)?|true|false|null)/g);
-            for (const [, key, val] of pairs) {
-                obj[key] = JSON.parse(val);
+        if (output !== null && typeof output === "object") {
+            parsedJson = output as Record<string, unknown>;
+        } else {
+            let rawOutput = (output ?? "") as string;
+            rawOutput = rawOutput.replace(/^```json\s*|^```\s*|\s*```$/gm, "").trim();
+            const jsonMatch = rawOutput.match(/\{[\s\S]*\}/);
+            if (jsonMatch) rawOutput = jsonMatch[0];
+            else if (!rawOutput.startsWith("{")) rawOutput = `{${rawOutput}}`;
+            try {
+                parsedJson = JSON.parse(rawOutput);
+            } catch {
+                const obj: Record<string, unknown> = {};
+                const pairs = rawOutput.matchAll(/"([^"]+)"\s*:\s*("(?:[^"\\]|\\.)*"|-?\d+(?:\.\d+)?|true|false|null)/g);
+                for (const [, key, val] of pairs) obj[key] = JSON.parse(val);
+                if (Object.keys(obj).length === 0) throw new Error(`Unparseable model output: ${rawOutput}`);
+                parsedJson = obj;
             }
-            if (Object.keys(obj).length === 0) throw new Error(`Unparseable model output: ${rawOutput}`);
-            parsedJson = obj;
         }
 
         if (!parsedJson.date || !/^\d{4}-\d{2}-\d{2}$/.test(parsedJson.date as string)) {
