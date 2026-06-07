@@ -22,7 +22,11 @@ export async function POST(req: NextRequest) {
         });
 
         const result = await response.json();
-        const output = result.output ?? result[0]?.generated_text;
+        const output = result.output !== undefined ? result.output : result[0]?.generated_text;
+
+        if (output == null) {
+            throw new Error("Model returned null or empty output");
+        }
 
         let parsedJson: Record<string, unknown>;
         if (output !== null && typeof output === "object") {
