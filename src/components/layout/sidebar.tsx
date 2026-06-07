@@ -21,7 +21,7 @@ interface NavItem {
 }
 
 const primaryNav: NavItem[] = [
-    { label: "Home", href: "/", icon: HomeLine },
+    { label: "Home", href: "/home", icon: HomeLine },
     { label: "Calendar", href: "/calendar", icon: Calendar },
     { label: "Tasks", href: "/tasks", icon: CheckSquare },
     { label: "Inbox", href: "/inbox", icon: Inbox01 },
@@ -35,10 +35,10 @@ export function Sidebar() {
     return (
         <aside className="hidden w-64 shrink-0 flex-col border-r border-secondary bg-primary md:flex">
             {/* Brand */}
-            <div className="flex h-16 items-center gap-2 px-5">
-                <CalendarHeart02 className="size-7"></CalendarHeart02>
+            <div className="flex h-16 items-center gap-2 px-5 pt-3">
+                <CalendarHeart02 className="size-7 text-brand-secondary"></CalendarHeart02>
                 <span className="translate-y-px text-[15px] font-semibold leading-none tracking-tight text-primary">
-                    Calendar
+                    CalendarAI
                 </span>
             </div>
 
