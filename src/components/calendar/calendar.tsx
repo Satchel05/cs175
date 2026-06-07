@@ -4,15 +4,49 @@ import { useState } from "react";
 import { ChevronDown, ChevronLeft, ChevronRight, Plus, SearchLg } from "@untitledui/icons";
 import { Badge } from "@/components/base/badges/badges";
 import { Button } from "@/components/base/buttons/button";
-import { may2026Days as seedData, weekdays } from "./calendar-data";
+import { buildMonthDays, weekdays, MONTH_NAMES, MONTH_ABBR } from "./calendar-data";
 import type { CalendarEvent, DayCell } from "./calendar-data";
 import { BandPill, EventPill } from "./event-pill";
 
+function getWeekOfMonth(date: Date): number {
+    return Math.ceil(date.getDate() / 7);
+}
+
 export function Calendar() {
-    const [days, setDays] = useState<DayCell[]>(seedData);
+    const now = new Date();
+    const [year, setYear] = useState(now.getFullYear());
+    const [month, setMonth] = useState(now.getMonth());
+    const [days, setDays] = useState<DayCell[]>(() => buildMonthDays(now.getFullYear(), now.getMonth()));
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    function goTo(newYear: number, newMonth: number) {
+        setYear(newYear);
+        setMonth(newMonth);
+        setDays(buildMonthDays(newYear, newMonth));
+    }
+
+    function prevMonth() {
+        const d = new Date(year, month - 1, 1);
+        goTo(d.getFullYear(), d.getMonth());
+    }
+
+    function nextMonth() {
+        const d = new Date(year, month + 1, 1);
+        goTo(d.getFullYear(), d.getMonth());
+    }
+
+    function goToday() {
+        const t = new Date();
+        goTo(t.getFullYear(), t.getMonth());
+    }
+
+    const today = new Date();
+    const isCurrentMonth = year === today.getFullYear() && month === today.getMonth();
+    const weekNum = isCurrentMonth ? getWeekOfMonth(today) : null;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const dateRangeLabel = `${MONTH_NAMES[month]} 1, ${year} – ${MONTH_NAMES[month]} ${daysInMonth}, ${year}`;
 
     async function handleAddEvent() {
         const trimmed = input.trim();
@@ -34,10 +68,11 @@ export function Calendar() {
             }
 
             const ev = await res.json();
-            // ev = { title, date "YYYY-MM-DD", time "HH:MM", duration_minutes, location, recurrence }
 
             const dayNum = new Date(ev.date + "T00:00:00").getDate();
-            const matched = days.some((cell) => cell.date === dayNum && !cell.outside);
+            const evMonth = new Date(ev.date + "T00:00:00").getMonth();
+            const evYear = new Date(ev.date + "T00:00:00").getFullYear();
+            const matched = evYear === year && evMonth === month && days.some((cell) => cell.date === dayNum && !cell.outside);
 
             if (!matched) {
                 setError(`The date ${ev.date} isn't visible on this month's grid.`);
@@ -73,19 +108,25 @@ export function Calendar() {
             <div className="flex items-center gap-4 border-b border-secondary px-5 py-4">
                 {/* Date card on the left */}
                 <div className="flex flex-col items-center rounded-lg border border-secondary px-3.5 py-1.5 leading-none">
-                    <span className="mb-1 text-[10px] font-semibold tracking-wider text-tertiary">MAY</span>
-                    <span className="text-[22px] font-semibold text-brand-secondary">10</span>
+                    <span className="mb-1 text-[10px] font-semibold tracking-wider text-tertiary">{MONTH_ABBR[month]}</span>
+                    <span className="text-[22px] font-semibold text-brand-secondary">
+                        {isCurrentMonth ? today.getDate() : 1}
+                    </span>
                 </div>
 
                 {/* Title + range */}
                 <div className="flex flex-1 flex-col gap-1">
                     <div className="flex items-center gap-2">
-                        <h1 className="text-[17px] font-semibold tracking-tight text-primary">May 2026</h1>
-                        <Badge color="gray" type="pill-color" size="sm">
-                            Week 2
-                        </Badge>
+                        <h1 className="text-[17px] font-semibold tracking-tight text-primary">
+                            {MONTH_NAMES[month]} {year}
+                        </h1>
+                        {weekNum && (
+                            <Badge color="gray" type="pill-color" size="sm">
+                                Week {weekNum}
+                            </Badge>
+                        )}
                     </div>
-                    <div className="text-[12.5px] text-tertiary">May 1, 2026 – May 31, 2026</div>
+                    <div className="text-[12.5px] text-tertiary">{dateRangeLabel}</div>
                 </div>
 
                 {/* Right-side actions */}
@@ -95,13 +136,20 @@ export function Calendar() {
                     <div className="inline-flex h-8 items-center overflow-hidden rounded-lg border border-secondary bg-primary">
                         <button
                             aria-label="Previous month"
+                            onClick={prevMonth}
                             className="flex h-full w-8 items-center justify-center text-tertiary hover:bg-secondary hover:text-primary"
                         >
                             <ChevronLeft className="size-3.5" />
                         </button>
-                        <button className="h-full border-x border-secondary px-3.5 text-[13px] font-medium text-primary hover:bg-secondary">Today</button>
+                        <button
+                            onClick={goToday}
+                            className="h-full border-x border-secondary px-3.5 text-[13px] font-medium text-primary hover:bg-secondary"
+                        >
+                            Today
+                        </button>
                         <button
                             aria-label="Next month"
+                            onClick={nextMonth}
                             className="flex h-full w-8 items-center justify-center text-tertiary hover:bg-secondary hover:text-primary"
                         >
                             <ChevronRight className="size-3.5" />
@@ -121,7 +169,7 @@ export function Calendar() {
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && handleAddEvent()}
-                        placeholder='e.g. "Team lunch on May 20 at noon"'
+                        placeholder={`e.g. "Team lunch on ${MONTH_NAMES[month]} 20 at noon"`}
                         className="h-8 flex-1 rounded-lg border border-secondary bg-primary px-3 text-sm text-primary placeholder:text-placeholder focus:border-brand focus:outline-none"
                     />
                     <Button size="sm" color="primary" iconLeading={Plus} isLoading={loading} onClick={handleAddEvent}>

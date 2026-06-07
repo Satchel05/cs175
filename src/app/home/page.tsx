@@ -1,9 +1,5 @@
 import { HomeScreen } from "@/components/home-screen/home-screen";
 
 export default function HomePage() {
-  return (
-      <div className="p-6">
-        <HomeScreen />
-      </div>
-    );
+    return <HomeScreen />;
 }
