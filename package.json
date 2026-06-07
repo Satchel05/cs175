@@ -16,8 +16,10 @@
         "@types/jest": "^30.0.0",
         "@untitledui/file-icons": "^0.0.9",
         "@untitledui/icons": "^0.0.22",
+        "all": "^0.0.0",
         "dotenv": "^17.4.2",
         "embla-carousel-react": "^8.6.0",
+        "flask": "^0.2.10",
         "input-otp": "^1.4.2",
         "jest": "^30.4.2",
         "jest-environment-node": "^30.4.1",
@@ -35,7 +37,8 @@
         "tailwindcss": "^4.2.2",
         "tailwindcss-animate": "^1.0.7",
         "tailwindcss-react-aria-components": "^2.0.1",
-        "ts-jest": "^29.4.11"
+        "ts-jest": "^29.4.11",
+        "transformers": "^3.1.0"
     },
     "devDependencies": {
         "@trivago/prettier-plugin-sort-imports": "^6.0.2",
