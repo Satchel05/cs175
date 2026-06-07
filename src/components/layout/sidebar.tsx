@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, CheckSquare, HomeLine, Inbox01, SearchLg, Settings01 } from "@untitledui/icons";
+import { Calendar, CheckSquare, HomeLine, Inbox01, SearchLg, Settings01, CalendarHeart02 } from "@untitledui/icons";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -36,12 +36,14 @@ export function Sidebar() {
         <aside className="hidden w-64 shrink-0 flex-col border-r border-secondary bg-primary md:flex">
             {/* Brand */}
             <div className="flex h-16 items-center gap-2 px-5">
-                <div className="size-7 rounded-md bg-brand-solid" />
-                <span className="text-[15px] font-semibold tracking-tight text-primary">Untitled</span>
+                <CalendarHeart02 className="size-7"></CalendarHeart02>
+                <span className="translate-y-px text-[15px] font-semibold leading-none tracking-tight text-primary">
+                    Calendar
+                </span>
             </div>
 
             {/* Search (visual only — wire up later) */}
-            <div className="px-3 pb-3">
+            <div className="px-3 pt-3">
                 <div className="flex h-9 items-center gap-2 rounded-lg border border-secondary bg-primary px-3 text-sm text-tertiary hover:bg-secondary">
                     <SearchLg className="size-4" />
                     <span>Search</span>
