@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, CheckSquare, HomeLine, Inbox01, SearchLg, Settings01, CalendarHeart02 } from "@untitledui/icons";
+import { Calendar, CalendarCheck02, HomeLine, SearchLg, Settings01, CalendarHeart02 } from "@untitledui/icons";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -23,8 +23,7 @@ interface NavItem {
 const primaryNav: NavItem[] = [
     { label: "Home", href: "/home", icon: HomeLine },
     { label: "Calendar", href: "/calendar", icon: Calendar },
-    { label: "Tasks", href: "/tasks", icon: CheckSquare },
-    { label: "Inbox", href: "/inbox", icon: Inbox01 },
+    { label: "Events", href: "/events", icon: CalendarCheck02 },
 ];
 
 const secondaryNav: NavItem[] = [{ label: "Settings", href: "/settings", icon: Settings01 }];

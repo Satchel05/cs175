@@ -1,12 +1,11 @@
 "use client";
 
-import { Calendar, CheckSquare, Inbox01, CalendarHeart02 } from "@untitledui/icons";
+import { Calendar, CalendarCheck02, CalendarHeart02 } from "@untitledui/icons";
 import Link from "next/link";
 
 const navItems = [
     { label: "Calendar", href: "/calendar", icon: Calendar, description: "View and manage your schedule" },
-    { label: "Tasks", href: "/tasks", icon: CheckSquare, description: "Track your to-dos and reminders" },
-    { label: "Inbox", href: "/inbox", icon: Inbox01, description: "Messages and notifications" },
+    { label: "Events", href: "/events", icon: CalendarCheck02, description: "Browse and track your events" },
 ];
 
 export function HomeScreen() {
@@ -20,7 +19,7 @@ export function HomeScreen() {
             </div>
 
             {/* Nav Cards */}
-            <div className="grid w-full max-w-4xl grid-cols-1 gap-5 sm:grid-cols-3">
+            <div className="grid w-full max-w-2xl grid-cols-1 gap-5 sm:grid-cols-2">
                 {navItems.map(({ label, href, icon: Icon, description }) => (
                     <Link
                         key={href}
