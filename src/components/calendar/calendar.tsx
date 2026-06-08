@@ -1,30 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ChevronDown, ChevronLeft, ChevronRight, Plus, SearchLg } from "@untitledui/icons";
 import { Badge } from "@/components/base/badges/badges";
 import { Button } from "@/components/base/buttons/button";
 import { buildMonthDays, weekdays, MONTH_NAMES, MONTH_ABBR } from "./calendar-data";
-import type { CalendarEvent, DayCell } from "./calendar-data";
+import type { CalendarEvent } from "./calendar-data";
 import { BandPill, EventPill } from "./event-pill";
+import { useCalendarEvents } from "@/providers/calendar-events-provider";
 
 function getWeekOfMonth(date: Date): number {
     return Math.ceil(date.getDate() / 7);
 }
 
 export function Calendar() {
+    const { events, addEvent } = useCalendarEvents();
     const now = new Date();
     const [year, setYear] = useState(now.getFullYear());
     const [month, setMonth] = useState(now.getMonth());
-    const [days, setDays] = useState<DayCell[]>(() => buildMonthDays(now.getFullYear(), now.getMonth()));
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    const days = useMemo(() => {
+        return buildMonthDays(year, month).map((cell) => {
+            if (cell.outside) return cell;
+            const key = `${year}-${String(month + 1).padStart(2, "0")}-${String(cell.date).padStart(2, "0")}`;
+            const cellEvents = events[key];
+            return cellEvents?.length ? { ...cell, events: cellEvents } : cell;
+        });
+    }, [year, month, events]);
+
     function goTo(newYear: number, newMonth: number) {
         setYear(newYear);
         setMonth(newMonth);
-        setDays(buildMonthDays(newYear, newMonth));
     }
 
     function prevMonth() {
@@ -69,15 +78,9 @@ export function Calendar() {
 
             const ev = await res.json();
 
-            const dayNum = new Date(ev.date + "T00:00:00").getDate();
-            const evMonth = new Date(ev.date + "T00:00:00").getMonth();
-            const evYear = new Date(ev.date + "T00:00:00").getFullYear();
-            const matched = evYear === year && evMonth === month && days.some((cell) => cell.date === dayNum && !cell.outside);
-
-            if (!matched) {
-                setError(`The date ${ev.date} isn't visible on this month's grid.`);
-                return;
-            }
+            const evDate = new Date(ev.date + "T00:00:00");
+            const evMonth = evDate.getMonth();
+            const evYear = evDate.getFullYear();
 
             const newEvent: CalendarEvent = {
                 name: ev.title,
@@ -88,15 +91,9 @@ export function Calendar() {
                 color: "brand",
             };
 
-            console.log(newEvent)
-            console.log(dayNum)
-
-            setDays((prev) =>
-                prev.map((cell) => {
-                    if (cell.date !== dayNum || cell.outside) return cell;
-                    return { ...cell, events: [...(cell.events ?? []), newEvent] };
-                }),
-            );
+            addEvent(ev.date, newEvent);
+            setYear(evYear);
+            setMonth(evMonth);
             setInput("");
         } catch {
             setError("Something went wrong. Please try again.");
