@@ -69,3 +69,53 @@ export function buildMonthDays(year: number, month: number): DayCell[] {
 
     return cells;
 }
+
+    export function expandRecurringEvents(
+        events: Record<string, CalendarEvent[]>,
+        year: number,
+        month: number
+        ): Record<string, CalendarEvent[]> {
+        const expanded: Record<string, CalendarEvent[]> = {};
+
+        // Copy non-recurring events as-is
+        for (const [dateKey, evList] of Object.entries(events)) {
+            expanded[dateKey] = [...evList];
+        }
+
+        // Now expand recurring ones
+        for (const [dateKey, evList] of Object.entries(events)) {
+            for (const ev of evList) {
+            if (!ev.recurrence) continue;
+
+            const origin = new Date(dateKey + "T00:00:00");
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const candidate = new Date(year, month, d);
+                if (
+                    candidate.getFullYear() === origin.getFullYear() &&
+                    candidate.getMonth() === origin.getMonth() &&
+                    candidate.getDate() === origin.getDate()
+                    ) continue; // don't double-count the origin
+
+                    const todayMidnight = new Date();
+                    todayMidnight.setHours(0, 0, 0, 0);
+                    if (candidate < todayMidnight) continue; // skip past occurrences
+
+                const matches =
+                (ev.recurrence === "daily") ||
+                (ev.recurrence === "weekly" && candidate.getDay() === origin.getDay()) ||
+                (ev.recurrence === "monthly" && candidate.getDate() === origin.getDate());
+
+                if (matches) {
+                const key = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+                expanded[key] ??= [];
+                expanded[key].push(ev);
+                }
+            }
+            }
+        }
+
+        return expanded;
+        }
+
