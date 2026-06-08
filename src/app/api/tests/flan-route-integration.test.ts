@@ -22,6 +22,8 @@ function isValidDate(str: string): boolean {
     return /^\d{4}-\d{2}-\d{2}$/.test(str) && !isNaN(Date.parse(str));
 }
 
+jest.setTimeout(30000);
+
 describe("Flan-T5 Integration Tests (requires serve.py on :8000)", () => {
     // ── Response shape ──────────────────────────────────────────────────────
 
