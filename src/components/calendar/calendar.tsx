@@ -88,6 +88,9 @@ export function Calendar() {
                 color: "brand",
             };
 
+            console.log(newEvent)
+            console.log(dayNum)
+
             setDays((prev) =>
                 prev.map((cell) => {
                     if (cell.date !== dayNum || cell.outside) return cell;

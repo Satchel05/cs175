@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
@@ -22,6 +24,7 @@ export async function POST(req: NextRequest) {
         });
 
         const result = await response.json();
+        console.log(`Json from flan: ${JSON.stringify(result, null, 2)}`)
         const output = result.output !== undefined ? result.output : result[0]?.generated_text;
 
         if (output == null) {
