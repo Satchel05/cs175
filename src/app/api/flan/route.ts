@@ -291,27 +291,12 @@ export async function POST(req: NextRequest) {
 
         const today = localDateString(new Date());
 
-        const prompt = `Extract a calendar event as JSON with fields:
-        title,
-        date (YYYY-MM-DD),
-        start_time (HH:MM),
-        end_time (HH:MM),
-        duration_minutes,
-        location,
-        recurrence.
-
-        Use null for missing fields.
-        If duration_minutes and start_time are provided, calculate end_time.
-        Output JSON only.
-
-        Input: ${text}`;
-
         const HF_MODEL_URL = process.env.HF_MODEL_URL ?? "http://127.0.0.1:8000/predict";
 
         const response = await fetch(HF_MODEL_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ inputs: prompt }),
+            body: JSON.stringify({ text }),
         });
 
         if (!response.ok) {
@@ -375,7 +360,7 @@ export async function POST(req: NextRequest) {
             end_time: resolvedEndTime ?? stringOrNull(parsedJson.end_time),
             duration_minutes: resolvedDuration ?? numberOrNull(parsedJson.duration_minutes),
             location: resolvedLocation ?? stringOrNull(parsedJson.location),
-            recurrence: resolvedRecurrence ?? stringOrNull(parsedJson.recurrence) ?? null,
+            recurrence: resolvedRecurrence ?? null,
         };
 
         return NextResponse.json(finalEvent, { status: 200 });
