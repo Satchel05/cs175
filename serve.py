@@ -69,12 +69,13 @@ def predict():
         Fields:
         - title
         - date
-        - time
+        - start_time
+        - end_time
         - duration_minutes
         - location
         - recurrence
 
-        Use null for missing fields.
+        Use null for missing fields. If duration and start_time are provided, calculate end_time.
 
         Input: {text}
 

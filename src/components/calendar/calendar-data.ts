@@ -13,6 +13,8 @@ export type EventColor =
 export interface CalendarEvent {
     name: string;
     time?: string;
+    start_time?: string | null;
+    end_time?: string | null;
     duration_minutes?: number;
     location?: string;
     recurrence?: string;
@@ -68,7 +70,7 @@ export function buildMonthDays(year: number, month: number): DayCell[] {
     }
 
     return cells;
-}
+    }
 
     export function expandRecurringEvents(
         events: Record<string, CalendarEvent[]>,
