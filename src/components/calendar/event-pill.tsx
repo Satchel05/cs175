@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import type { CalendarEvent, EventColor } from "./calendar-data";
 
 /**
@@ -21,21 +24,81 @@ const tints: Record<EventColor, { bg: string; border: string; text: string }> = 
 };
 
 export function EventPill({ event }: { event: CalendarEvent }) {
+  const [expanded, setExpanded] = useState(false);
   const t = tints[event.color];
+
+  const formatTime = (time?: string | null) => {
+    if (!time) return undefined;
+
+    const [hourRaw, minuteRaw] = time.split(":");
+    let hour = Number(hourRaw);
+    const minute = minuteRaw ?? "00";
+    const suffix = hour >= 12 ? "PM" : "AM";
+
+    hour = hour % 12 || 12;
+
+    return `${hour}:${minute} ${suffix}`;
+  };
+
+  const timeRange =
+    event.start_time && event.end_time
+      ? `${formatTime(event.start_time)} – ${formatTime(event.end_time)}`
+      : event.start_time
+        ? formatTime(event.start_time)
+        : event.time
+          ? formatTime(event.time)
+          : undefined;
+
   const meta = [
-    event.time,
+    timeRange,
     event.duration_minutes ? `${event.duration_minutes} min` : undefined,
     event.location,
     event.recurrence && event.recurrence !== "none" ? event.recurrence : undefined,
-  ].filter(Boolean).join(" · ");
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
   return (
-    <div
-      className={`flex cursor-pointer flex-col gap-0.5 rounded-md border px-1.5 py-1 text-xs ${t.bg} ${t.border}`}
+    <button
+      type="button"
+      onClick={() => setExpanded((prev) => !prev)}
+      aria-expanded={expanded}
+      title={event.name}
+      className={`group flex w-full cursor-pointer flex-col gap-1 rounded-lg border px-2 py-1.5 text-left text-xs shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-brand-primary/30 ${t.bg} ${t.border}`}
     >
-      <span className={`truncate font-medium ${t.text}`}>{event.name}</span>
-      {meta && <span className="truncate text-[11px] text-tertiary">{meta}</span>}
-    </div>
+      <div className="flex items-start justify-between gap-1">
+        <span
+          className={`font-semibold ${t.text} ${
+            expanded ? "whitespace-normal break-words leading-snug" : "truncate"
+          }`}
+        >
+          {event.name}
+        </span>
+
+        <span className={`shrink-0 text-[10px] font-bold ${t.text}`}>
+          {expanded ? "−" : "+"}
+        </span>
+      </div>
+
+      {meta && (
+        <span
+          className={`text-[11px] font-medium text-tertiary ${
+            expanded ? "whitespace-normal break-words leading-snug" : "truncate"
+          }`}
+        >
+          {meta}
+        </span>
+      )}
+
+      {expanded && (
+        <div className="mt-1 rounded-md bg-white/70 px-2 py-1 text-[11px] text-tertiary shadow-inner">
+          <div>Start: {formatTime(event.start_time) ?? "N/A"}</div>
+          <div>End: {formatTime(event.end_time) ?? "N/A"}</div>
+          {event.duration_minutes && <div>Duration: {event.duration_minutes} min</div>}
+          {event.location && <div>Location: {event.location}</div>}
+        </div>
+      )}
+    </button>
   );
 }
 

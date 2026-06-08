@@ -69,12 +69,13 @@ def predict():
         Fields:
         - title
         - date
-        - time
+        - start_time
+        - end_time
         - duration_minutes
         - location
         - recurrence
 
-        Use null for missing fields.
+        Use null for missing fields. If duration and start_time are provided, calculate end_time.
 
         Input: {text}
 
@@ -95,8 +96,6 @@ def predict():
         input_text = input_match.group(1).strip() if input_match else text
         input_lower = input_text.lower()
 
-        if not re.search(DURATION_PATTERN, input_lower, re.IGNORECASE):
-            result["duration_minutes"] = None
         if not re.search(LOCATION_PATTERN, input_lower, re.IGNORECASE):
             result["location"] = None
 

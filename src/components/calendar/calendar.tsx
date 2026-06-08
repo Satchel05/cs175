@@ -87,6 +87,8 @@ export function Calendar() {
             const newEvent: CalendarEvent = {
                 name: ev.title,
                 time: ev.time ?? undefined,
+                start_time: ev.start_time ?? null,
+                end_time: ev.end_time ?? null,
                 duration_minutes: ev.duration_minutes ?? undefined,
                 location: ev.location ?? undefined,
                 recurrence: ev.recurrence ?? undefined,
