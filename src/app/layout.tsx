@@ -1,4 +1,5 @@
 import "@/styles/globals.css";
+import { CalendarEventsProvider } from "@/providers/calendar-events-provider";
 
 export const metadata = {
   title: "Calendar App",
@@ -7,7 +8,9 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <CalendarEventsProvider>{children}</CalendarEventsProvider>
+      </body>
     </html>
   );
 }
