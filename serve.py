@@ -96,8 +96,6 @@ def predict():
         input_text = input_match.group(1).strip() if input_match else text
         input_lower = input_text.lower()
 
-        if not re.search(DURATION_PATTERN, input_lower, re.IGNORECASE):
-            result["duration_minutes"] = None
         if not re.search(LOCATION_PATTERN, input_lower, re.IGNORECASE):
             result["location"] = None
 

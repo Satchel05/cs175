@@ -193,7 +193,7 @@ function resolveTitle(text: string): string | null {
         .trim();
 
     const titleMatch = cleaned.match(
-        /^(.+?)(?:\s+at\s+|\s+on\s+|\s+tomorrow\b|\s+today\b|\s+in\s+\d+\s+(?:days?|weeks?)|\s+next\s+week\b)/i
+        /^(.+?)(?:\s+at\s+|\s+on\s+|\s+tomorrow\b|\s+today\b|\s+in\s+\d+\s+(?:days?|weeks?)|\s+next\s+week\b|\s+every\s+)/i
     );
 
     if (titleMatch) {
@@ -247,7 +247,8 @@ function resolveRecurrence(text: string): string | null {
         return "daily";
     }
 
-    if (lower.includes("every week") || lower.includes("weekly")) {
+    if (lower.includes("every week") || lower.includes("weekly") ||
+        /\bevery\s+(sunday|monday|tuesday|wednesday|thursday|friday|saturday)\b/.test(lower)) {
         return "weekly";
     }
 
@@ -343,22 +344,24 @@ export async function POST(req: NextRequest) {
 
         const resolvedDate = resolveDate(text);
         const resolvedTimeRange = resolveTimeRange(text);
-        const resolvedStartTime = resolvedTimeRange.start_time;
-        let resolvedEndTime = resolvedTimeRange.end_time;
         const resolvedTitle = resolveTitle(text);
         const resolvedDuration = resolveDuration(text);
-        if (!resolvedEndTime && resolvedStartTime && resolvedDuration) {
-            resolvedEndTime = addMinutes(resolvedStartTime, resolvedDuration);
-        }
         const resolvedLocation = resolveLocation(text);
         const resolvedRecurrence = resolveRecurrence(text);
+
+        const finalStartTime = resolvedTimeRange.start_time ?? stringOrNull(parsedJson.start_time) ?? stringOrNull(parsedJson.time);
+        const finalDuration = resolvedDuration ?? numberOrNull(parsedJson.duration_minutes);
+        let finalEndTime = resolvedTimeRange.end_time ?? stringOrNull(parsedJson.end_time);
+        if (!finalEndTime && finalStartTime && finalDuration) {
+            finalEndTime = addMinutes(finalStartTime, finalDuration);
+        }
 
         const finalEvent = {
             title: resolvedTitle ?? stringOrNull(parsedJson.title) ?? "Untitled Event",
             date: resolvedDate ?? stringOrNull(parsedJson.date) ?? today,
-            start_time: resolvedStartTime ?? stringOrNull(parsedJson.start_time),
-            end_time: resolvedEndTime ?? stringOrNull(parsedJson.end_time),
-            duration_minutes: resolvedDuration ?? numberOrNull(parsedJson.duration_minutes),
+            start_time: finalStartTime,
+            end_time: finalEndTime,
+            duration_minutes: finalDuration,
             location: resolvedLocation ?? stringOrNull(parsedJson.location),
             recurrence: resolvedRecurrence ?? null,
         };
