@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { ChevronDown, ChevronLeft, ChevronRight, Plus, SearchLg } from "@untitledui/icons";
 import { Badge } from "@/components/base/badges/badges";
 import { Button } from "@/components/base/buttons/button";
-import { buildMonthDays, weekdays, MONTH_NAMES, MONTH_ABBR } from "./calendar-data";
+import { buildMonthDays, weekdays, MONTH_NAMES, MONTH_ABBR, expandRecurringEvents  } from "./calendar-data";
 import type { CalendarEvent } from "./calendar-data";
 import { BandPill, EventPill } from "./event-pill";
 import { useCalendarEvents } from "@/providers/calendar-events-provider";
@@ -23,12 +23,14 @@ export function Calendar() {
     const [error, setError] = useState<string | null>(null);
 
     const days = useMemo(() => {
-        return buildMonthDays(year, month).map((cell) => {
-            if (cell.outside) return cell;
-            const key = `${year}-${String(month + 1).padStart(2, "0")}-${String(cell.date).padStart(2, "0")}`;
-            const cellEvents = events[key];
-            return cellEvents?.length ? { ...cell, events: cellEvents } : cell;
-        });
+    const expandedEvents = expandRecurringEvents(events, year, month); // ← add this
+
+    return buildMonthDays(year, month).map((cell) => {
+        if (cell.outside) return cell;
+        const key = `${year}-${String(month + 1).padStart(2, "0")}-${String(cell.date).padStart(2, "0")}`;
+        const cellEvents = expandedEvents[key]; // ← use expandedEvents, not events
+        return cellEvents?.length ? { ...cell, events: cellEvents } : cell;
+    });
     }, [year, month, events]);
 
     function goTo(newYear: number, newMonth: number) {
@@ -100,7 +102,9 @@ export function Calendar() {
         } finally {
             setLoading(false);
         }
+
     }
+
 
     return (
         <div className="overflow-hidden rounded-2xl border border-secondary bg-primary shadow-sm">

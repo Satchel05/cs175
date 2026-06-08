@@ -63,13 +63,31 @@ def predict():
         return jsonify({"error": "text is required"}), 400
 
     try:
-        inputs = tokenizer(text, return_tensors="pt", truncation=True, max_length=512)
+        prompt = f"""
+        Convert the following calendar request into JSON.
+
+        Fields:
+        - title
+        - date
+        - time
+        - duration_minutes
+        - location
+        - recurrence
+
+        Use null for missing fields.
+
+        Input: {text}
+
+        Output:
+        """
+
+        inputs = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=512)
         outputs = model.generate(**inputs, max_new_tokens=256, num_beams=4)
         decoded = tokenizer.decode(outputs[0], skip_special_tokens=True).strip()
 
         # Strip markdown code fences if present
         decoded = re.sub(r'^```(?:json)?\s*|\s*```$', '', decoded, flags=re.MULTILINE).strip()
-
+        print("DECODED:", decoded)
         result = extract_json(decoded)
 
         # Extract the user's original input from after "Input:" if the full prompt was sent
