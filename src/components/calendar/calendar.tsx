@@ -21,6 +21,7 @@ export function Calendar() {
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [useClaude, setUseClaude] = useState(false);
 
     const days = useMemo(() => {
     const expandedEvents = expandRecurringEvents(events, year, month); // ← add this
@@ -67,7 +68,7 @@ export function Calendar() {
         setError(null);
 
         try {
-            const res = await fetch("/api/flan", {
+            const res = await fetch(useClaude ? "/api/claude" : "/api/flan", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ text: trimmed }),
@@ -181,6 +182,26 @@ export function Calendar() {
                     <Button size="sm" color="primary" iconLeading={Plus} isLoading={loading} onClick={handleAddEvent}>
                         Add event
                     </Button>
+
+                    {/* Model toggle */}
+                    <div className="inline-flex h-8 items-center overflow-hidden rounded-lg border border-secondary bg-primary">
+                        <button
+                            onClick={() => setUseClaude(false)}
+                            className={`h-full px-3 text-xs font-medium transition duration-100 ease-linear ${
+                                !useClaude ? "bg-brand-solid text-white" : "text-tertiary hover:bg-secondary hover:text-primary"
+                            }`}
+                        >
+                            Flan-T5
+                        </button>
+                        <button
+                            onClick={() => setUseClaude(true)}
+                            className={`h-full border-l border-secondary px-3 text-xs font-medium transition duration-100 ease-linear ${
+                                useClaude ? "bg-brand-solid text-white" : "text-tertiary hover:bg-secondary hover:text-primary"
+                            }`}
+                        >
+                            Claude
+                        </button>
+                    </div>
                 </div>
                 {error && <p className="text-xs text-error-primary">{error}</p>}
             </div>
